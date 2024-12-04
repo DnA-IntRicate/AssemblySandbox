@@ -1,0 +1,9 @@
+# Build and intermediate paths
+[Bb]in/
+[Oo]bj/
+[Ii]nt/
+
+# Intermediate files
+*.o
+*.obj
+
