@@ -1,4 +1,4 @@
 #!/bin/bash
 
-spim -file HelloWorld.mips
+spim -file HelloWorld.asm
 exit 0

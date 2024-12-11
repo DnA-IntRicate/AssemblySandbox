@@ -1,4 +1,4 @@
 #!/bin/bash
 
-spim -file Calculator.mips
+spim -file Calculator.asm
 exit 0
