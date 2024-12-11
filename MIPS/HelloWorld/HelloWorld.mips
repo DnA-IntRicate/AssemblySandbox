@@ -1,13 +1,13 @@
+.globl main
+
 .data
     msg: .asciiz "Hello World!\n"
 
 .text
-.globl main
+    main:
+        li $v0, 4   # Print String
+        la $a0, msg
+        syscall
 
-main:
-    li $v0, 4   # Print String
-    la $a0, msg
-    syscall
-
-    li $v0, 10  # Sys exit
-    syscall
+        li $v0, 10  # Sys exit
+        syscall
