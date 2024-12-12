@@ -12,11 +12,12 @@
     OP_MUL: .word 3
     OP_DIV: .word 4
     OP_MOD: .word 5
+    OP_EXIT: .word 6
 
     NEWLINE: .asciiz "\n"
     prompt1: .asciiz "Enter a number: "
     prompt2: .asciiz "Enter another number: "
-    prompt3: .asciiz "Enter the operation to use:\n1 - Addition\n2 - Subtraction\n3 - Multiplication\n4 - Division\n5 - Modulo\n"
+    prompt3: .asciiz "Enter the operation to use:\n1 - Addition\n2 - Subtraction\n3 - Multiplication\n4 - Division\n5 - Modulo\n6 - Exit\n"
     outputStr: .asciiz "\nThe answer is: "
 
 .text
@@ -64,79 +65,90 @@
     main:
         addi $sp, $sp, -8    # Allocate 8 bytes of stack space
 
-        # Get the first number from the user and push it onto the stack
-        la $a0, prompt1
-        jal InputInt
-        sw $t0, 0($sp)
+        MainLoop:
+            # Get the first number from the user and push it onto the stack
+            la $a0, prompt1
+            jal InputInt
+            sw $t0, 0($sp)
 
-        # Get the second number from the user and push it onto the stack
-        la $a0, prompt2
-        jal InputInt
-        sw $t0, 4($sp)
+            # Get the second number from the user and push it onto the stack
+            la $a0, prompt2
+            jal InputInt
+            sw $t0, 4($sp)
 
-        # Get the user's desired mathematical operation
-        la $a0, prompt3
-        jal InputInt
+            # Get the user's desired mathematical operation
+            la $a0, prompt3
+            jal InputInt
 
-        # If-else-if chain
-        lw $t1, OP_ADD
-        beq $t0, $t1, Add
-        lw $t1, OP_SUB
-        beq $t0, $t1, Sub
-        lw $t1, OP_MUL
-        beq $t0, $t1, Mul
-        lw $t1, OP_DIV
-        beq $t0, $t1, Div
-        lw $t1, OP_MOD
-        beq $t0, $t1, Mod
+            # If-else-if chain
+            lw $t1, OP_ADD
+            beq $t0, $t1, Add
+            lw $t1, OP_SUB
+            beq $t0, $t1, Sub
+            lw $t1, OP_MUL
+            beq $t0, $t1, Mul
+            lw $t1, OP_DIV
+            beq $t0, $t1, Div
+            lw $t1, OP_MOD
+            beq $t0, $t1, Mod
+            lw $t1, OP_EXIT
+            beq $t0, $t1, Exit
 
-        # Add the numbers
-        Add:
-            lw $t1, 0($sp)
-            lw $t2, 4($sp)
-            add $t0, $t1, $t2
-            j Output
+            # Add the numbers
+            Add:
+                lw $t1, 0($sp)
+                lw $t2, 4($sp)
+                add $t0, $t1, $t2
+                j Output
 
-        # Subtract the one number from the other
-        Sub:
-            lw $t1, 0($sp)
-            lw $t2, 4($sp)
-            sub $t0, $t1, $t2
-            j Output
+            # Subtract the one number from the other
+            Sub:
+                lw $t1, 0($sp)
+                lw $t2, 4($sp)
+                sub $t0, $t1, $t2
+                j Output
 
-        # Multiply the numbers
-        Mul:
-            lw $t1, 0($sp)
-            lw $t2, 4($sp)
-            mult $t1, $t2
-            mflo $t0
-            j Output
+            # Multiply the numbers
+            Mul:
+                lw $t1, 0($sp)
+                lw $t2, 4($sp)
+                mult $t1, $t2
+                mflo $t0
+                j Output
 
-        # Divide the one number by the other
-        Div:
-            lw $t1, 0($sp)
-            lw $t2, 4($sp)
-            div $t1, $t2
-            mflo $t0
-            j Output
+            # Divide the one number by the other
+            Div:
+                lw $t1, 0($sp)
+                lw $t2, 4($sp)
+                div $t1, $t2
+                mflo $t0
+                j Output
 
-        # Divide the one number by the other and return the modulo
-        Mod:
-            lw $t1, 0($sp)
-            lw $t2, 4($sp)
-            div $t1, $t2
-            mfhi $t0
-            j Output
+            # Divide the one number by the other and return the modulo
+            Mod:
+                lw $t1, 0($sp)
+                lw $t2, 4($sp)
+                div $t1, $t2
+                mfhi $t0
+                j Output
 
-        # Print the result
-        Output:
-            la $a0, outputStr
-            xor $a1, $a1, $a1
-            jal Print
+            # Print the result and continue the main loop
+            Output:
+                la $a0, outputStr
+                xor $a1, $a1, $a1
+                jal Print
 
-            move $a0, $t0
-            jal PrintInt
+                move $a0, $t0
+                jal PrintInt
 
-        addi $sp, $sp, 8    # Deallocate stack space
-        lb $v0, SYS_EXIT
-        syscall
+                la $a0, NEWLINE
+                xor $a1, $a1, $a1
+                jal Print
+
+                j MainLoop
+
+        # Exit the program
+        Exit:
+            addi $sp, $sp, 8    # Deallocate stack space
+            lb $v0, SYS_EXIT
+            syscall
