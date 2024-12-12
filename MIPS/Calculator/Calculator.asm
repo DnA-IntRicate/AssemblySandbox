@@ -15,9 +15,9 @@
     OP_EXIT: .word 6
 
     NEWLINE: .asciiz "\n"
-    prompt1: .asciiz "Enter a number: "
-    prompt2: .asciiz "Enter another number: "
-    prompt3: .asciiz "Enter the operation to use:\n1 - Addition\n2 - Subtraction\n3 - Multiplication\n4 - Division\n5 - Modulo\n6 - Exit\n"
+    prompt1: .asciiz "Enter the operation to use:\n1 - Addition\n2 - Subtraction\n3 - Multiplication\n4 - Division\n5 - Modulo\n6 - Exit\n"
+    prompt2: .asciiz "Enter a number: "
+    prompt3: .asciiz "Enter another number: "
     outputStr: .asciiz "\nThe answer is: "
 
 .text
@@ -63,24 +63,30 @@
         jr $ra
 
     main:
-        addi $sp, $sp, -8    # Allocate 8 bytes of stack space
+        addi $sp, $sp, -12    # Allocate 12 bytes of stack space
 
         MainLoop:
-            # Get the first number from the user and push it onto the stack
+            # Get the user's desired mathematical operation
             la $a0, prompt1
             jal InputInt
             sw $t0, 0($sp)
 
-            # Get the second number from the user and push it onto the stack
+            # If the user chose to exit
+            lw $t1, OP_EXIT
+            beq $t0, $t1, Exit
+
+            # Get the first number from the user and push it onto the stack
             la $a0, prompt2
             jal InputInt
             sw $t0, 4($sp)
 
-            # Get the user's desired mathematical operation
+            # Get the second number from the user and push it onto the stack
             la $a0, prompt3
             jal InputInt
+            sw $t0, 8($sp)
 
             # If-else-if chain
+            lw $t0, 0($sp)
             lw $t1, OP_ADD
             beq $t0, $t1, Add
             lw $t1, OP_SUB
@@ -91,43 +97,41 @@
             beq $t0, $t1, Div
             lw $t1, OP_MOD
             beq $t0, $t1, Mod
-            lw $t1, OP_EXIT
-            beq $t0, $t1, Exit
 
             # Add the numbers
             Add:
-                lw $t1, 0($sp)
-                lw $t2, 4($sp)
+                lw $t1, 4($sp)
+                lw $t2, 8($sp)
                 add $t0, $t1, $t2
                 j Output
 
             # Subtract the one number from the other
             Sub:
-                lw $t1, 0($sp)
-                lw $t2, 4($sp)
+                lw $t1, 4($sp)
+                lw $t2, 8($sp)
                 sub $t0, $t1, $t2
                 j Output
 
             # Multiply the numbers
             Mul:
-                lw $t1, 0($sp)
-                lw $t2, 4($sp)
+                lw $t1, 4($sp)
+                lw $t2, 8($sp)
                 mult $t1, $t2
                 mflo $t0
                 j Output
 
             # Divide the one number by the other
             Div:
-                lw $t1, 0($sp)
-                lw $t2, 4($sp)
+                lw $t1, 4($sp)
+                lw $t2, 8($sp)
                 div $t1, $t2
                 mflo $t0
                 j Output
 
             # Divide the one number by the other and return the modulo
             Mod:
-                lw $t1, 0($sp)
-                lw $t2, 4($sp)
+                lw $t1, 4($sp)
+                lw $t2, 8($sp)
                 div $t1, $t2
                 mfhi $t0
                 j Output
@@ -149,6 +153,6 @@
 
         # Exit the program
         Exit:
-            addi $sp, $sp, 8    # Deallocate stack space
+            addi $sp, $sp, 12    # Deallocate stack space
             lb $v0, SYS_EXIT
             syscall
