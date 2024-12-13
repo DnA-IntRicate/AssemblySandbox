@@ -12,10 +12,11 @@
     OP_MUL: .word 3
     OP_DIV: .word 4
     OP_MOD: .word 5
-    OP_EXIT: .word 6
+    OP_POW: .word 6
+    OP_EXIT: .word 7
 
     NEWLINE: .asciiz "\n"
-    prompt1: .asciiz "Enter the operation to use:\n1 - Addition\n2 - Subtraction\n3 - Multiplication\n4 - Division\n5 - Modulo\n6 - Exit\n"
+    prompt1: .asciiz "Enter the operation to use:\n1 - Addition\n2 - Subtraction\n3 - Multiplication\n4 - Division\n5 - Modulo\n6 - Power\n7 - Exit\n"
     prompt2: .asciiz "Enter a number: "
     prompt3: .asciiz "Enter another number: "
     outputStr: .asciiz "\nThe answer is: "
@@ -109,6 +110,9 @@
             lw $t1, OP_MOD
             beq $t0, $t1, Mod
             nop
+            lw $t1, OP_POW
+            beq $t0, $t1, Pow
+            nop
 
             # Add the numbers
             Add:
@@ -150,6 +154,23 @@
                 lw $t2, 8($sp)
                 div $t1, $t2
                 mfhi $t0
+                j Output
+                nop
+
+            # Raise the one number to the power of the other number
+            Pow:
+                lw $t1, 4($sp)
+                lw $t2, 8($sp)      # The power we are raising to
+                li $t0, 1
+                beq $t2, $zero, Output   # Handle if the power is 0
+                nop
+
+                PowerLoop:
+                    mul $t0, $t0, $t1
+                    addi $t2, $t2, -1
+                    bne $t2, $zero, PowerLoop   # Loop till $t2 == 0
+                    nop
+
                 j Output
                 nop
 
