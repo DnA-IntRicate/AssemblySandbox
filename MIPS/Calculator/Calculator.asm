@@ -97,19 +97,14 @@
             lw $t0, 0($sp)
             lw $t1, OP_ADD
             beq $t0, $t1, Add
-            nop
             lw $t1, OP_SUB
             beq $t0, $t1, Sub
-            nop
             lw $t1, OP_MUL
             beq $t0, $t1, Mul
-            nop
             lw $t1, OP_DIV
             beq $t0, $t1, Div
-            nop
             lw $t1, OP_MOD
             beq $t0, $t1, Mod
-            nop
             lw $t1, OP_POW
             beq $t0, $t1, Pow
             nop
