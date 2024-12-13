@@ -30,12 +30,14 @@
 
         beq $a1, 1, NewLine
         jr $ra
+        nop
 
         NewLine:
             la $a0, NEWLINE
             syscall
 
         jr $ra
+        nop
 
     # Print an integer with a trailing newline
     PrintInt:
@@ -48,6 +50,7 @@
         syscall
 
         jr $ra
+        nop
 
     # Read integer input from the user
     InputInt:
@@ -61,6 +64,7 @@
 
         move $t0, $v0
         jr $ra
+        nop
 
     main:
         addi $sp, $sp, -12    # Allocate 12 bytes of stack space
@@ -69,6 +73,7 @@
             # Get the user's desired mathematical operation
             la $a0, prompt1
             jal InputInt
+            nop
             sw $t0, 0($sp)
 
             # If the user chose to exit
@@ -78,25 +83,32 @@
             # Get the first number from the user and push it onto the stack
             la $a0, prompt2
             jal InputInt
+            nop
             sw $t0, 4($sp)
 
             # Get the second number from the user and push it onto the stack
             la $a0, prompt3
             jal InputInt
+            nop
             sw $t0, 8($sp)
 
             # If-else-if chain
             lw $t0, 0($sp)
             lw $t1, OP_ADD
             beq $t0, $t1, Add
+            nop
             lw $t1, OP_SUB
             beq $t0, $t1, Sub
+            nop
             lw $t1, OP_MUL
             beq $t0, $t1, Mul
+            nop
             lw $t1, OP_DIV
             beq $t0, $t1, Div
+            nop
             lw $t1, OP_MOD
             beq $t0, $t1, Mod
+            nop
 
             # Add the numbers
             Add:
@@ -104,6 +116,7 @@
                 lw $t2, 8($sp)
                 add $t0, $t1, $t2
                 j Output
+                nop
 
             # Subtract the one number from the other
             Sub:
@@ -111,6 +124,7 @@
                 lw $t2, 8($sp)
                 sub $t0, $t1, $t2
                 j Output
+                nop
 
             # Multiply the numbers
             Mul:
@@ -119,6 +133,7 @@
                 mult $t1, $t2
                 mflo $t0
                 j Output
+                nop
 
             # Divide the one number by the other
             Div:
@@ -127,6 +142,7 @@
                 div $t1, $t2
                 mflo $t0
                 j Output
+                nop
 
             # Divide the one number by the other and return the modulo
             Mod:
@@ -135,21 +151,26 @@
                 div $t1, $t2
                 mfhi $t0
                 j Output
+                nop
 
             # Print the result and continue the main loop
             Output:
                 la $a0, outputStr
                 xor $a1, $a1, $a1
                 jal Print
+                nop
 
                 move $a0, $t0
                 jal PrintInt
+                nop
 
                 la $a0, NEWLINE
                 xor $a1, $a1, $a1
                 jal Print
+                nop
 
                 j MainLoop
+                nop
 
         # Exit the program
         Exit:
